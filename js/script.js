@@ -40,8 +40,7 @@ window.addEventListener('DOMContentLoaded', function () {
 	});
 
 	// Timer
-
-	const deadline = '2020-05-11';
+	const deadline = '2020-08-31';
 
 	function getTimeRemaining(endtime) {
 		const t = Date.parse(endtime) - Date.parse(new Date()),
@@ -150,11 +149,10 @@ window.addEventListener('DOMContentLoaded', function () {
 			this.price = price;
 			this.classes = classes;
 			this.parent = document.querySelector(parentSelector);
-			this.transfer = 27;
-			this.changeToUAH();
+			this.transfer = 73;
+			this.changeToRUS();
 		}
-
-		changeToUAH() {
+		changeToRUS() {
 			this.price = this.price * this.transfer;
 		}
 
@@ -175,8 +173,8 @@ window.addEventListener('DOMContentLoaded', function () {
                 <div class="menu__item-divider"></div>
                 <div class="menu__item-price">
                     <div class="menu__item-cost">Цена:</div>
-                    <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
-                </div>
+                    <div class="menu__item-total"><span>${this.price}</span> руб/день</div>
+               </div>
             `;
 			this.parent.append(element);
 		}
@@ -283,4 +281,8 @@ window.addEventListener('DOMContentLoaded', function () {
 			closeModal();
 		}, 4000);
 	}
+
+	fetch('http://localhost:3000/menu')
+		.then(data => data.json())
+		.then(res => console.log(res));
 });
