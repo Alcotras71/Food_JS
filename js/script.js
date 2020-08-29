@@ -128,6 +128,7 @@ window.addEventListener('DOMContentLoaded', function () {
 	});
 
 	const modalTimerId = setTimeout(openModal, 300000);
+	// Изменил значение, чтобы не отвлекало
 
 	function showModalByScroll() {
 		if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
@@ -137,7 +138,7 @@ window.addEventListener('DOMContentLoaded', function () {
 	}
 	window.addEventListener('scroll', showModalByScroll);
 
-	// Use classes for make cards
+	// Используем классы для создание карточек меню
 
 	class MenuCard {
 		constructor(src, alt, title, descr, price, parentSelector, ...classes) {
@@ -179,19 +180,9 @@ window.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
-	const getResource = async (url) => {
-		const res = await fetch(url);
-
-		if (!res.ok) {
-			throw new Error(`Could not fetch ${url}, status: ${res.status}`);
-		}
-
-		return await res.json();
-	};
-
-	getResource('http://localhost:3000/menu')
+	axios.get('http://localhost:3000/menu')
 		.then(data => {
-			data.forEach(({
+			data.data.forEach(({
 				img,
 				altimg,
 				title,
@@ -205,6 +196,7 @@ window.addEventListener('DOMContentLoaded', function () {
 	// Forms
 
 	const forms = document.querySelectorAll('form');
+
 	const message = {
 		loading: 'img/form/spinner.svg',
 		success: 'Спасибо! Скоро мы с вами свяжемся',
