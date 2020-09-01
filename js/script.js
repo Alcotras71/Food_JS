@@ -40,7 +40,7 @@ window.addEventListener('DOMContentLoaded', function () {
 	});
 
 	// Timer
-	const deadline = '2020-08-31';
+	const deadline = '2020-09-31';
 
 	function getTimeRemaining(endtime) {
 		const t = Date.parse(endtime) - Date.parse(new Date()),
@@ -277,10 +277,21 @@ window.addEventListener('DOMContentLoaded', function () {
 		prev = document.querySelector('.offer__slider-prev'),
 		next = document.querySelector('.offer__slider-next'),
 		total = document.querySelector('#total'),
-		current = document.querySelector('#current');
-	let slideIndex = 1;
+		current = document.querySelector('#current'),
+		slidesField = document.querySelector('.offer__slider-inner'),
+		slidesWrapper = document.querySelector('.offer__slider-wrapper'),
+		width = window.getComputedStyle(slidesWrapper).width;
 
-	showSlides(slideIndex);
+	let slideIndex = 1;
+	let offset = 0;
+
+	function checkCurrentSLide() {
+		if (slides.length < 10) {
+			current.textContent = `0${slideIndex}`;
+		} else {
+			current.textContent = slideIndex;
+		}
+	}
 
 	if (slides.length < 10) {
 		total.textContent = `0${slides.length}`;
@@ -288,38 +299,53 @@ window.addEventListener('DOMContentLoaded', function () {
 		total.textContent = slides.length;
 	}
 
-	function showSlides(n) {
-		if (n > slides.length) {
-			slideIndex = 1;
-		}
+	checkCurrentSLide();
 
-		if (n < 1) {
-			slideIndex = slides.length;
-		}
+	slidesField.style.width = 100 * slides.length + '%';
+	slidesField.style.display = 'flex';
+	slidesField.style.transition = '0.5s all';
 
-		if (slideIndex < 10) {
-			current.textContent = `0${slideIndex}`;
+	slidesWrapper.style.overflow = 'hidden';
+
+	slides.forEach(slide => {
+		slide.style.width = width;
+	});
+
+	next.addEventListener('click', () => {
+		if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
+			offset = 0;
 		} else {
-			current.textContent = slideIndex;
+			offset += +width.slice(0, width.length - 2);
 		}
 
-		slides.forEach(slide => {
-			slide.style.display = 'none';
-		});
+		slidesField.style.transform = `translateX(-${offset}px)`;
 
-		slides[slideIndex - 1].style.display = 'block';
-	}
+		if (slideIndex == slides.length) {
+			slideIndex = 1;
+		} else {
+			slideIndex++;
+		}
 
-	function plusSlide(n) {
-		showSlides(slideIndex += n);
-	}
-
-	next.addEventListener('click', e => {
-		plusSlide(1);
+		checkCurrentSLide();
 	});
 
-	prev.addEventListener('click', e => {
-		plusSlide(-1);
+	prev.addEventListener('click', () => {
+		if (offset == 0) {
+			offset = +width.slice(0, width.length - 2) * (slides.length - 1);
+		} else {
+			offset -= +width.slice(0, width.length - 2);
+		}
+
+		slidesField.style.transform = `translateX(-${offset}px)`;
+
+		if (slideIndex == 1) {
+			slideIndex = slides.length;
+		} else {
+			slideIndex--;
+		}
+
+		checkCurrentSLide();
 	});
+
 
 });
