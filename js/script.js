@@ -2,52 +2,59 @@ window.addEventListener('DOMContentLoaded', function () {
 
 	// Tabs
 
-	let tabs = document.querySelectorAll('.tabheader__item'),
+	const tabs = document.querySelectorAll('.tabheader__item'),
 		tabsContent = document.querySelectorAll('.tabcontent'),
-		tabsParent = document.querySelector('.tabheader__items');
+		tabsParent = document.querySelector('.tabheader');
 
-	function hideTabContent() {
-
+	function hideTabs() {
 		tabsContent.forEach(item => {
 			item.classList.add('hide');
 			item.classList.remove('show', 'fade');
 		});
 
-		tabs.forEach(item => {
-			item.classList.remove('tabheader__item_active');
+		tabs.forEach(tab => {
+			tab.classList.remove('tabheader__item_active');
 		});
 	}
 
-	function showTabContent(i = 0) {
+	function showTab(i) {
 		tabsContent[i].classList.add('show', 'fade');
 		tabsContent[i].classList.remove('hide');
 		tabs[i].classList.add('tabheader__item_active');
 	}
 
-	hideTabContent();
-	showTabContent();
+	hideTabs();
+	showTab(0);
 
-	tabsParent.addEventListener('click', function (event) {
-		const target = event.target;
+	tabsParent.addEventListener('click', (e) => {
+		const target = e.target;
+
 		if (target && target.classList.contains('tabheader__item')) {
-			tabs.forEach((item, i) => {
-				if (target == item) {
-					hideTabContent();
-					showTabContent(i);
+
+			tabs.forEach((tab, i) => {
+				if (tab === target) {
+					hideTabs();
+					showTab(i);
 				}
 			});
 		}
 	});
 
 	// Timer
-	const deadline = '2020-09-31';
 
-	function getTimeRemaining(endtime) {
-		const t = Date.parse(endtime) - Date.parse(new Date()),
-			days = Math.floor((t / (1000 * 60 * 60 * 24))),
-			seconds = Math.floor((t / 1000) % 60),
-			minutes = Math.floor((t / 1000 / 60) % 60),
-			hours = Math.floor((t / (1000 * 60 * 60) % 24));
+	const deadline = new Date('sep 22, 2020');
+	let date = document.querySelector('.promotion__descr .date');
+	let hoursMinutes = document.querySelector('.promotion__descr .hours-minutes');
+
+	date.innerText = deadline.getDate();
+	hoursMinutes.innerText = `${getZero(deadline.getHours())}:${getZero(deadline.getMinutes())}`;
+
+	function getTimeRemaining() {
+		const t = deadline - new Date(),
+			days = Math.floor(t / (1000 * 60 * 60 * 24)),
+			hours = Math.floor((t / (1000 * 60 * 60)) % 24),
+			minutes = Math.floor((t / (1000 * 60)) % 60),
+			seconds = Math.floor((t / (1000)) % 60);
 
 		return {
 			'total': t,
@@ -59,27 +66,25 @@ window.addEventListener('DOMContentLoaded', function () {
 	}
 
 	function getZero(num) {
-		if (num >= 0 && num < 10) {
-			return '0' + num;
+		if (num < 10) {
+			return `0${num}`;
 		} else {
 			return num;
 		}
 	}
 
 	function setClock(selector, endtime) {
-
 		const timer = document.querySelector(selector),
-			days = timer.querySelector("#days"),
-			hours = timer.querySelector('#hours'),
-			minutes = timer.querySelector('#minutes'),
-			seconds = timer.querySelector('#seconds'),
+			days = document.querySelector('#days'),
+			hours = document.querySelector('#hours'),
+			minutes = document.querySelector('#minutes'),
+			seconds = document.querySelector('#seconds'),
 			timeInterval = setInterval(updateClock, 1000);
 
 		updateClock();
 
 		function updateClock() {
 			const t = getTimeRemaining(endtime);
-
 			days.innerHTML = getZero(t.days);
 			hours.innerHTML = getZero(t.hours);
 			minutes.innerHTML = getZero(t.minutes);
@@ -87,95 +92,109 @@ window.addEventListener('DOMContentLoaded', function () {
 
 			if (t.total <= 0) {
 				clearInterval(timeInterval);
+				timer.classList.add('hide');
 			}
 		}
 	}
 
-	setClock('.timer', deadline);
+	setClock('.promotion', deadline);
 
 	// Modal
 
-	const modalTrigger = document.querySelectorAll('[data-modal]'),
-		modal = document.querySelector('.modal');
-
-	modalTrigger.forEach(btn => {
-		btn.addEventListener('click', openModal);
-	});
+	const modalBtn = document.querySelectorAll('[data-modal]'),
+		modalWindow = document.querySelector('.modal'),
+		modalCloseBtn = document.querySelector('.modal__close'),
+		modalTimerId = setTimeout(openModal, 30000);
 
 	function closeModal() {
-		modal.classList.add('hide');
-		modal.classList.remove('show');
+		modalWindow.classList.add('hide');
+		modalWindow.classList.remove('show');
 		document.body.style.overflow = '';
 	}
 
 	function openModal() {
-		modal.classList.add('show');
-		modal.classList.remove('hide');
-		document.body.style.overflow = 'hidden';
+		modalWindow.classList.add('show');
+		modalWindow.classList.remove('hide');
 		clearInterval(modalTimerId);
+		document.body.style.overflow = 'hidden';
 	}
 
-	modal.addEventListener('click', (e) => {
-		if (e.target === modal || e.target.getAttribute('data-close') == "") {
+	modalBtn.forEach(btn => {
+		btn.addEventListener('click', (e) => {
+			if (e.target) {
+				openModal(e.target);
+			}
+		});
+	});
+
+	modalCloseBtn.addEventListener('click', (e) => {
+		if (e.target && modalWindow.classList.contains('show')) {
+			closeModal(e.target);
+		}
+	});
+
+	modalWindow.addEventListener('click', (e) => {
+		if (e.target === modalWindow && modalWindow.classList.contains('show')) {
 			closeModal();
 		}
 	});
 
-	document.addEventListener('keydown', (e) => {
-		if (e.code === "Escape" && modal.classList.contains('show')) {
+	window.addEventListener('keydown', (e) => {
+		if (e.code === 'Escape' && modalWindow.classList.contains('show')) {
 			closeModal();
 		}
 	});
-
-	const modalTimerId = setTimeout(openModal, 300000);
-	// Изменил значение, чтобы не отвлекало
 
 	function showModalByScroll() {
-		if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+		if (window.pageYOffset + document.documentElement.clientHeight >=
+			document.documentElement.scrollHeight) {
 			openModal();
 			window.removeEventListener('scroll', showModalByScroll);
 		}
 	}
+
 	window.addEventListener('scroll', showModalByScroll);
 
-	// Используем классы для создание карточек меню
+	// RenderMenu
 
 	class MenuCard {
-		constructor(src, alt, title, descr, price, parentSelector, ...classes) {
-			this.src = src;
-			this.alt = alt;
+		constructor(img, altimg, title, descr, price, parentSelector, ...classes) {
+			this.img = img;
+			this.altimg = altimg;
 			this.title = title;
 			this.descr = descr;
 			this.price = price;
 			this.classes = classes;
 			this.parent = document.querySelector(parentSelector);
 			this.transfer = 73;
-			this.changeToRUS();
+			this.changeToRUB();
 		}
-		changeToRUS() {
-			this.price = this.price * this.transfer;
+
+		changeToRUB() {
+			this.price *= this.transfer;
 		}
 
 		render() {
 			const element = document.createElement('div');
 
 			if (this.classes.length === 0) {
-				this.classes = "menu__item";
+				this.classes = 'menu__item';
 				element.classList.add(this.classes);
 			} else {
 				this.classes.forEach(className => element.classList.add(className));
 			}
 
 			element.innerHTML = `
-                <img src=${this.src} alt=${this.alt}>
-                <h3 class="menu__item-subtitle">${this.title}</h3>
-                <div class="menu__item-descr">${this.descr}</div>
-                <div class="menu__item-divider"></div>
-                <div class="menu__item-price">
-                    <div class="menu__item-cost">Цена:</div>
-                    <div class="menu__item-total"><span>${this.price}</span> руб/день</div>
-               </div>
-            `;
+						<img src=${this.img} alt=${this.altimg}>
+							<h3 class="menu__item-subtitle">${this.title}</h3>
+							<div class="menu__item-descr">${this.descr}</div>
+							<div class="menu__item-divider"></div>
+							<div class="menu__item-price">
+								<div class="menu__item-cost">Цена:</div>
+								<div class="menu__item-total"><span>${this.price}</span> руб/день</div>
+						</div>
+			`;
+
 			this.parent.append(element);
 		}
 	}
@@ -193,6 +212,7 @@ window.addEventListener('DOMContentLoaded', function () {
 			});
 		});
 
+
 	// Forms
 
 	const forms = document.querySelectorAll('form');
@@ -203,13 +223,13 @@ window.addEventListener('DOMContentLoaded', function () {
 		failure: 'Что-то пошло не так...'
 	};
 
-	forms.forEach(item => {
-		bindPostData(item);
+	forms.forEach(form => {
+		bindPostData(form);
 	});
 
 	const postData = async (url, data) => {
 		const res = await fetch(url, {
-			method: "POST",
+			method: 'POST',
 			headers: {
 				'Content-type': 'application/json'
 			},
@@ -225,10 +245,11 @@ window.addEventListener('DOMContentLoaded', function () {
 
 			let statusMessage = document.createElement('img');
 			statusMessage.src = message.loading;
-			statusMessage.style.cssText = `
-                display: block;
-                margin: 0 auto;
-            `;
+			statusMessage.cssText = `
+						display: block;
+						margin: 0 auto;
+					`;
+
 			form.insertAdjacentElement('afterend', statusMessage);
 
 			const formData = new FormData(form);
@@ -257,12 +278,14 @@ window.addEventListener('DOMContentLoaded', function () {
 		const thanksModal = document.createElement('div');
 		thanksModal.classList.add('modal__dialog');
 		thanksModal.innerHTML = `
-            <div class="modal__content">
-                <div class="modal__close" data-close>×</div>
-                <div class="modal__title">${message}</div>
-            </div>
-        `;
+				<div class="modal__content">
+	             <div class="modal__close" data-close>×</div>
+	             <div class="modal__title">${message}</div>
+	         </div>
+		`;
+
 		document.querySelector('.modal').append(thanksModal);
+
 		setTimeout(() => {
 			thanksModal.remove();
 			prevModalDialog.classList.add('show');
@@ -271,7 +294,7 @@ window.addEventListener('DOMContentLoaded', function () {
 		}, 4000);
 	}
 
-	// Slider
+	// Slider 
 
 	const slides = document.querySelectorAll('.offer__slide'),
 		prev = document.querySelector('.offer__slider-prev'),
@@ -285,21 +308,23 @@ window.addEventListener('DOMContentLoaded', function () {
 	let slideIndex = 1;
 	let offset = 0;
 
+	function moveSlide() {
+		slidesField.style.transform = `translateX(-${offset}px)`;
+	}
+
 	function checkCurrentSLide() {
-		if (slides.length < 10) {
+		if (slides.length > 10) {
 			current.textContent = `0${slideIndex}`;
 		} else {
 			current.textContent = slideIndex;
 		}
 	}
 
-	if (slides.length < 10) {
+	if (slides.length > 10) {
 		total.textContent = `0${slides.length}`;
 	} else {
 		total.textContent = slides.length;
 	}
-
-	checkCurrentSLide();
 
 	slidesField.style.width = 100 * slides.length + '%';
 	slidesField.style.display = 'flex';
@@ -311,6 +336,8 @@ window.addEventListener('DOMContentLoaded', function () {
 		slide.style.width = width;
 	});
 
+	checkCurrentSLide();
+
 	next.addEventListener('click', () => {
 		if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
 			offset = 0;
@@ -318,7 +345,7 @@ window.addEventListener('DOMContentLoaded', function () {
 			offset += +width.slice(0, width.length - 2);
 		}
 
-		slidesField.style.transform = `translateX(-${offset}px)`;
+		moveSlide();
 
 		if (slideIndex == slides.length) {
 			slideIndex = 1;
@@ -327,6 +354,8 @@ window.addEventListener('DOMContentLoaded', function () {
 		}
 
 		checkCurrentSLide();
+
+		activeDot();
 	});
 
 	prev.addEventListener('click', () => {
@@ -336,7 +365,7 @@ window.addEventListener('DOMContentLoaded', function () {
 			offset -= +width.slice(0, width.length - 2);
 		}
 
-		slidesField.style.transform = `translateX(-${offset}px)`;
+		moveSlide();
 
 		if (slideIndex == 1) {
 			slideIndex = slides.length;
@@ -345,6 +374,48 @@ window.addEventListener('DOMContentLoaded', function () {
 		}
 
 		checkCurrentSLide();
+
+		activeDot();
+	});
+
+	// SliderNavigation
+
+	const slider = document.querySelector('.offer__slider');
+
+	slider.style.position = 'relative';
+
+	const dotsWrapper = document.createElement('ol'),
+		dots = [];
+
+	function activeDot() {
+		dots.forEach(dot => dot.style.opacity = '0.5');
+		dots[slideIndex - 1].style.opacity = 1;
+	}
+
+	dotsWrapper.classList.add('carousel-indicators');
+	slider.append(dotsWrapper);
+
+	for (let i = 0; i < slides.length; i++) {
+		const dot = document.createElement('li');
+		dot.setAttribute('data-slide-to', i + 1);
+		dot.classList.add('dot');
+		if (i == 0) {
+			dot.style.opacity = 1;
+		}
+		dotsWrapper.append(dot);
+		dots.push(dot);
+	}
+
+	dots.forEach(dot => {
+		dot.addEventListener('click', (e) => {
+			const slideTo = e.target.getAttribute('data-slide-to');
+
+			slideIndex = slideTo;
+			offset = +width.slice(0, width.length - 2) * (slideTo - 1);
+			moveSlide();
+			checkCurrentSLide();
+			activeDot();
+		});
 	});
 
 
