@@ -423,7 +423,7 @@ window.addEventListener('DOMContentLoaded', function () {
 		});
 	});
 
-	// Calculator
+	// Calc
 
 	const result = document.querySelector('.calculating__result span');
 
