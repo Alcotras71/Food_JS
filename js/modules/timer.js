@@ -1,9 +1,8 @@
-function timer() {
+function timer(selector, deadline, dateSelector, hoursMinutesSelector) {
 	// Timer
 
-	const deadline = new Date('sep 30, 2020');
-	let date = document.querySelector('.promotion__descr .date');
-	let hoursMinutes = document.querySelector('.promotion__descr .hours-minutes');
+	const date = document.querySelector(dateSelector),
+		hoursMinutes = document.querySelector(hoursMinutesSelector);
 
 	date.innerText = deadline.getDate();
 	hoursMinutes.innerText = `${getZero(deadline.getHours())}:${getZero(deadline.getMinutes())}`;
@@ -56,7 +55,7 @@ function timer() {
 		}
 	}
 
-	setClock('.promotion', deadline);
+	setClock(selector, deadline);
 }
 
-module.exports = timer;
+export default timer;

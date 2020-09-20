@@ -1,8 +1,8 @@
-function calc() {
+function calc(resultSelector) {
 
 	// Calculator
 
-	const result = document.querySelector('.calculating__result span');
+	const result = document.querySelector(resultSelector);
 
 	let gender, height, weight, age, ratio;
 
@@ -14,7 +14,7 @@ function calc() {
 	}
 
 	if (localStorage.getItem('ratio')) {
-		gender = localStorage.getItem('ratio');
+		ratio = localStorage.getItem('ratio');
 	} else {
 		ratio = 1.375;
 		localStorage.setItem('ratio', 1.375);
@@ -110,4 +110,4 @@ function calc() {
 	getDynamicInformation('#age');
 }
 
-module.exports = calc;
+export default calc;
