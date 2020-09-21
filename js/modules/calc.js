@@ -1,4 +1,4 @@
-function calc(resultSelector) {
+function calc({ resultSelector, genderSelector, activitySelector, activeClass, heightSelector, weightSelector, ageSelector }) {
 
 	// Calculator
 
@@ -34,8 +34,8 @@ function calc(resultSelector) {
 		});
 	}
 
-	initLocalSettings('#gender div', 'calculating__choose-item_active');
-	initLocalSettings('.calculating__choose_big div', 'calculating__choose-item_active');
+	initLocalSettings(genderSelector, activeClass);
+	initLocalSettings(activitySelector, activeClass);
 
 	function calcTotal() {
 		if (!gender || !height || !weight || !age || !ratio) {
@@ -75,8 +75,8 @@ function calc(resultSelector) {
 		});
 	}
 
-	getStaticInformation('#gender div', 'calculating__choose-item_active');
-	getStaticInformation('.calculating__choose_big div', 'calculating__choose-item_active');
+	getStaticInformation(genderSelector, activeClass);
+	getStaticInformation(activitySelector, activeClass);
 
 	function getDynamicInformation(selector) {
 		const input = document.querySelector(selector);
@@ -105,9 +105,9 @@ function calc(resultSelector) {
 		});
 	}
 
-	getDynamicInformation('#height');
-	getDynamicInformation('#weight');
-	getDynamicInformation('#age');
+	getDynamicInformation(heightSelector);
+	getDynamicInformation(weightSelector);
+	getDynamicInformation(ageSelector);
 }
 
 export default calc;

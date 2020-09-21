@@ -29,6 +29,14 @@ window.addEventListener('DOMContentLoaded', function () {
 		wrapper: '.offer__slider-wrapper',
 		field: '.offer__slider-inner'
 	});
-	calc('.calculating__result span');
+	calc({
+		resultSelector: '.calculating__result span',
+		genderSelector: '#gender div',
+		activitySelector: '.calculating__choose_big div',
+		activeClass: 'calculating__choose-item_active',
+		heightSelector: '#height',
+		weightSelector: '#weight',
+		ageSelector: '#age'
+	});
 
 });
